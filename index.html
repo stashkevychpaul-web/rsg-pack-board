@@ -1,0 +1,400 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RSG Pack Board</title>
+<style>
+  :root {
+    --bg: #13151a;
+    --surface: #1c1f26;
+    --surface-2: #242832;
+    --line: #2e3340;
+    --text: #e9ebf0;
+    --muted: #8b92a3;
+    --accent: #13aff0;
+
+    --todo: #4a5060;
+    --wip: #f0a020;
+    --done: #2fbf71;
+    --bad: #ef4f5f;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font: 14px/1.4 "Segoe UI", system-ui, -apple-system, sans-serif;
+  }
+  svg.i { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+  svg.logo { width: 20px; height: 20px; flex: none; display: block; }
+
+  /* header */
+  header {
+    position: sticky; top: 0; z-index: 5;
+    background: rgba(19, 21, 26, .92);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--line);
+  }
+  .bar { max-width: 1880px; margin: 0 auto; padding: 12px 24px; display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; }
+  .brand { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 17px; margin-right: 6px; }
+  .brand svg.i { width: 20px; height: 20px; color: var(--accent); }
+  .brand small { font-weight: 400; font-size: 11px; color: var(--muted); margin-left: 4px; }
+
+  .pills { display: flex; flex-wrap: wrap; gap: 6px; }
+  .pill {
+    border: 1px solid var(--line); background: var(--surface); color: var(--muted);
+    height: 32px; padding: 0 11px; border-radius: 999px; cursor: pointer; font: inherit; font-size: 13px;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .pill:hover { border-color: #47506a; color: var(--text); }
+  .pill.on { background: var(--surface-2); border-color: var(--accent); color: var(--text); }
+  .pill .n { font-variant-numeric: tabular-nums; font-weight: 600; color: var(--text); }
+  .pill .lbl { font-weight: 700; font-size: 11px; letter-spacing: .5px; }
+
+  .search { margin-left: auto; position: relative; flex: 0 1 240px; min-width: 180px; }
+  .search svg.i { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--muted); }
+  .search input {
+    width: 100%; height: 32px; background: var(--surface); border: 1px solid var(--line); color: var(--text);
+    border-radius: 999px; padding: 0 12px 0 32px; font: inherit;
+  }
+  .search input:focus { outline: none; border-color: var(--accent); }
+
+  main { max-width: 1880px; margin: 0 auto; padding: 20px 24px 48px; }
+
+  /* grid + card; the outline is the overall pack status */
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 18px; }
+  .card {
+    background: var(--surface); border-radius: 8px; overflow: hidden;
+    border: 2px solid transparent; transition: transform .15s;
+  }
+  .card:hover { transform: translateY(-2px); }
+  .card.done     { border-color: var(--done); }
+  .card.rejected { border-color: var(--bad); }
+
+  .thumb { position: relative; aspect-ratio: 16 / 9; background: var(--surface-2); overflow: hidden; }
+  .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .3s; }
+  .card:hover .thumb img { transform: scale(1.04); }
+  .thumb .ph {
+    width: 100%; height: 100%; display: grid; place-items: center;
+    font-size: 40px; font-weight: 800; letter-spacing: 2px; color: rgba(255,255,255,.18);
+    background: repeating-linear-gradient(135deg, #222631 0 14px, #1e222c 14px 28px);
+  }
+  .badge {
+    position: absolute; top: 10px; left: 10px;
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 4px 10px 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .6px; color: #fff;
+    background: rgba(10, 11, 14, .78); border-left: 3px solid var(--c);
+  }
+  .badge svg.i { width: 14px; height: 14px; color: var(--c); }
+  .tag {
+    flex: none; padding: 1px 6px; border-radius: 4px; font-size: 10px; font-weight: 800; letter-spacing: .5px;
+    background: var(--surface-2); color: var(--muted); border: 1px solid var(--line);
+  }
+  .tag.free { color: #7be3a8; }
+
+  .body { padding: 12px 14px 14px; }
+  .head { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; }
+  .info { min-width: 0; flex: 1; }
+  .title { font-weight: 700; font-size: 15px; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .title a { color: inherit; text-decoration: none; }
+  .title a:hover { color: var(--accent); }
+  .sub { color: var(--muted); font-size: 12px; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .meta { flex: none; display: flex; flex-direction: column; align-items: flex-end; gap: 4px; margin-top: 2px; }
+  .date {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 12px; font-weight: 600; color: var(--muted); font-variant-numeric: tabular-nums;
+  }
+  .date svg.i { width: 13px; height: 13px; }
+  .date.late { color: var(--bad); }
+  .date.released { color: var(--done); }
+
+  /* 4 stage icons, coloured by stage status */
+  .stages { display: flex; gap: 6px; }
+  .stage {
+    width: 32px; height: 32px; border-radius: 8px; display: grid; place-items: center; cursor: default;
+    background: var(--surface-2); color: var(--todo); border: 1px solid var(--line);
+  }
+  .stage svg.i { width: 17px; height: 17px; }
+  .stage.wip      { color: var(--wip);  border-color: color-mix(in srgb, var(--wip) 55%, transparent);  background: color-mix(in srgb, var(--wip) 14%, var(--surface-2)); }
+  .stage.done     { color: var(--done); border-color: color-mix(in srgb, var(--done) 55%, transparent); background: color-mix(in srgb, var(--done) 14%, var(--surface-2)); }
+  .stage.rejected { color: var(--bad);  border-color: color-mix(in srgb, var(--bad) 60%, transparent);  background: color-mix(in srgb, var(--bad) 16%, var(--surface-2)); }
+  .stage:hover { filter: brightness(1.25); }
+
+  /* status mark: grey ring = not started, yellow clock = in progress, green check = done, red cross = rejected */
+  .mark { width: 18px; height: 18px; border-radius: 50%; display: grid; place-items: center; flex: none; border: 2px solid var(--todo); }
+  .mark svg.i { width: 11px; height: 11px; stroke-width: 3; }
+  .mark.wip      { background: var(--wip);  border-color: var(--wip);  color: #241600; }
+  .mark.done     { background: var(--done); border-color: var(--done); color: #fff; }
+  .mark.rejected { background: var(--bad);  border-color: var(--bad);  color: #fff; }
+
+  /* popover */
+  .pop {
+    position: fixed; z-index: 20; min-width: 220px; max-width: 280px;
+    background: #0e1014; border: 1px solid var(--line); border-radius: 10px;
+    box-shadow: 0 12px 32px rgba(0,0,0,.5); padding: 10px 12px 8px;
+    opacity: 0; pointer-events: none; transform: translateY(4px); transition: opacity .12s, transform .12s;
+  }
+  .pop.show { opacity: 1; transform: none; }
+  .pop-h { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 13px; padding-bottom: 8px; margin-bottom: 4px; border-bottom: 1px solid var(--line); }
+  .pop-h > svg.i { color: var(--c); }
+  .pop-h .cnt { margin-left: auto; color: var(--muted); font-weight: 600; font-size: 12px; font-variant-numeric: tabular-nums; }
+  .pop-r { display: flex; align-items: center; gap: 9px; padding: 5px 0; font-size: 13px; }
+  .pop-r .nm { flex: 1; min-width: 0; }
+  .pop-r .dt { color: var(--muted); font-size: 11px; font-variant-numeric: tabular-nums; }
+  .pop-r .bullet { width: 20px; display: grid; place-items: center; color: var(--muted); }
+
+  /* legend */
+  .legend { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; color: var(--muted); font-size: 12px; margin-top: 28px; }
+  .legend span { display: inline-flex; align-items: center; gap: 7px; }
+  .legend .stage { width: 24px; height: 24px; border-radius: 6px; }
+  .legend .stage svg.i { width: 13px; height: 13px; }
+  .legend .box { width: 26px; height: 18px; border-radius: 4px; border: 2px solid var(--line); background: var(--surface); }
+  .legend .sep { width: 1px; height: 18px; background: var(--line); }
+
+  .empty { color: var(--muted); padding: 60px 0; text-align: center; grid-column: 1 / -1; }
+
+  @media (max-width: 640px) {
+    .bar, main { padding-left: 16px; padding-right: 16px; }
+    .search { margin-left: 0; flex: 1 1 100%; }
+    .grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="bar">
+    <div class="brand" id="brand"></div>
+    <div class="pills" id="stageFilter"></div>
+    <div class="pills" id="typeFilter"></div>
+    <label class="search" id="searchWrap"><input id="search" type="search" placeholder="Search"></label>
+  </div>
+</header>
+
+<main>
+  <div class="grid" id="grid"></div>
+  <div class="legend" id="legend"></div>
+</main>
+<div class="pop" id="pop"></div>
+
+<script src="packs-data.js"></script>
+<script>
+  // Lucide-style 24x24 stroke icons
+  const ICON = {
+    layers: '<path d="m12 2 10 5-10 5L2 7z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/>',
+    box:    '<path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/>',
+    camera: '<path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/>',
+    upload: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m17 8-5-5-5 5"/><path d="M12 3v12"/>',
+    megaphone: '<path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/>',
+    globe:  '<circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/>',
+    share:  '<circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.59 13.51 6.83 3.98"/><path d="m15.41 6.51-6.82 3.98"/>',
+    calendar: '<rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/>',
+    check:  '<path d="M20 6 9 17l-5-5"/>',
+    checkc: '<circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>',
+    clock:  '<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>',
+    x:      '<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
+    xcircle:'<circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/>',
+    dot:    '<circle cx="12" cy="12" r="2"/>',
+    search: '<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
+    grid:   '<rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/>',
+  };
+  const ic = name => `<svg class="i" viewBox="0 0 24 24">${ICON[name]}</svg>`;
+
+  // Stylized store marks, drawn after the official logos
+  const LOGO = {
+    // Fab: black italic "FAB" on a white rounded blob
+    fab: `<svg class="logo" viewBox="0 0 24 24"><path d="M5 6.5h15.5a2.5 2.5 0 0 1 2.4 3.1l-1.5 5.8a3 3 0 0 1-2.9 2.1H2.6a1.6 1.6 0 0 1-1.5-2l2-7.2A2.5 2.5 0 0 1 5 6.5z" fill="#fff"/><text x="12" y="15.6" text-anchor="middle" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-style="italic" font-size="8.2" fill="#000" letter-spacing="-.3">FAB</text></svg>`,
+    // Unity: three-face cube
+    unity: `<svg class="logo" viewBox="0 0 24 24"><path d="M12 2.75 19.36 7 12 11.25 4.64 7z" fill="#fff"/><path d="M3.99 8.13 11.35 12.38v8.5L3.99 16.63z" fill="#fff" opacity=".72"/><path d="M20.01 8.13 12.65 12.38v8.5l7.36-4.25z" fill="#fff" opacity=".45"/></svg>`,
+    // CGTrader: teal hexagon open at the upper right
+    cgtrader: `<svg class="logo" viewBox="0 0 24 24"><path d="M16.7 5.7 12 3 4.2 7.5v9L12 21l7.8-4.5V11" fill="none" stroke="#1fc8b8" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  };
+  const STORE_NAME = { fab: "Fab", unity: "Unity Asset Store", cgtrader: "CGTrader" };
+  const ITEM_ICON = { Website: "globe", Social: "share" };
+
+  const STAGES = [
+    { id: "production", label: "Production", icon: "box" },
+    { id: "promo",      label: "Promo",      icon: "camera" },
+    { id: "stores",     label: "Stores",     icon: "upload" },
+    { id: "mkt",        label: "MKT",        icon: "megaphone" },
+  ];
+  const COLOR = { todo: "var(--todo)", wip: "var(--wip)", done: "var(--done)", rejected: "var(--bad)" };
+  const MARK_ICON = { todo: null, wip: "clock", done: "check", rejected: "x" };
+  const STATUS_LABEL = { todo: "not started", wip: "in progress", done: "done", rejected: "rejected" };
+
+  const packs = window.PACKS || [];
+  const state = { stage: "all", type: "all", q: "" };
+  const today = new Date(new Date().toDateString());
+
+  const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const initials = name => name.split(/[\s—-]+/).filter(Boolean).slice(0, 2).map(w => w[0]).join("").toUpperCase();
+  const mark = s => `<span class="mark ${s}" title="${STATUS_LABEL[s]}">${MARK_ICON[s] ? ic(MARK_ICON[s]) : ""}</span>`;
+  const parseDate = s => s ? new Date(s + "T00:00:00") : null;
+  const fmtDate = d => d.toLocaleDateString("en-GB", { day: "numeric", month: "short", ...(d.getFullYear() !== today.getFullYear() ? { year: "numeric" } : {}) });
+
+  // item value: "done" or ["done", "2026-10-27"]
+  const itemOf = v => Array.isArray(v) ? { s: v[0], date: v[1] } : { s: v || "todo" };
+  const items = (p, id) => Object.entries(p.stages?.[id]?.items || {}).map(([k, v]) => ({ key: k, ...itemOf(v) }));
+  function stageStatus(p, id) {
+    const st = p.stages?.[id];
+    if (st?.status) return st.status;
+    const s = items(p, id).map(i => i.s);
+    if (!s.length) return "todo";
+    if (s.includes("rejected")) return "rejected";
+    if (s.every(x => x === "done")) return "done";
+    if (s.some(x => x !== "todo")) return "wip";
+    return "todo";
+  }
+  function packStatus(p) {
+    const s = STAGES.map(x => stageStatus(p, x.id));
+    if (s.includes("rejected")) return "rejected";
+    if (s.every(x => x === "done")) return "done";
+    if (s.some(x => x !== "todo")) return "wip";
+    return "todo";
+  }
+  // current stage = first stage that is not done
+  const currentStage = p => STAGES.find(s => stageStatus(p, s.id) !== "done") || null;
+
+  document.getElementById("brand").innerHTML = `${ic("grid")}Pack Board<small>${esc(window.PACKS_UPDATED || "")}</small>`;
+  document.getElementById("searchWrap").insertAdjacentHTML("afterbegin", ic("search"));
+
+  function filterKey(p) { return currentStage(p)?.id || "complete"; }
+
+  // sort order: least ready first — current stage, "not started" before "in progress"; complete packs last
+  function readiness(p) {
+    const cur = currentStage(p);
+    if (!cur) return STAGES.length * 2;
+    return STAGES.indexOf(cur) * 2 + (stageStatus(p, cur.id) === "todo" ? 0 : 1);
+  }
+  // newer first; no date counts as newest
+  const dateKey = p => parseDate(p.release)?.getTime() ?? Infinity;
+
+  function renderFilters() {
+    const count = id => packs.filter(p =>
+      id === "all" ? true : id === "rejected" ? packStatus(p) === "rejected" : filterKey(p) === id).length;
+    const opts = [
+      { id: "all", label: "All", icon: "layers", c: "var(--text)" },
+      ...STAGES.map(s => ({ ...s, c: "var(--text)" })),
+      { id: "complete", label: "Done", icon: "checkc", c: "var(--done)" },
+      { id: "rejected", label: "Rejected", icon: "xcircle", c: "var(--bad)" },
+    ];
+    const el = document.getElementById("stageFilter");
+    el.innerHTML = opts.map(s => `
+      <button class="pill ${state.stage === s.id ? "on" : ""}" data-stage="${s.id}" title="${s.label}">
+        <span style="color:${s.c};display:flex">${ic(s.icon)}</span><span class="n">${count(s.id)}</span>
+      </button>`).join("");
+    el.querySelectorAll("button").forEach(b => b.onclick = () => { state.stage = b.dataset.stage; render(); });
+
+    const typeEl = document.getElementById("typeFilter");
+    typeEl.innerHTML = [["all", "ALL"], ["Paid", "$"], ["Free", "FREE"]].map(([t, l]) => `
+      <button class="pill ${state.type === t ? "on" : ""}" data-type="${t}" title="${t === "all" ? "Free + Paid" : t}"><span class="lbl">${l}</span></button>`).join("");
+    typeEl.querySelectorAll("button").forEach(b => b.onclick = () => { state.type = b.dataset.type; render(); });
+  }
+
+  function card(p, idx) {
+    const status = packStatus(p);
+    const cur = currentStage(p);
+    const badge = cur
+      ? { label: cur.label, icon: cur.icon, c: COLOR[stageStatus(p, cur.id)] === COLOR.todo ? "var(--muted)" : COLOR[stageStatus(p, cur.id)] }
+      : { label: "Done", icon: "checkc", c: "var(--done)" };
+
+    const rel = parseDate(p.release);
+    let date = "";
+    if (rel) {
+      const days = Math.round((rel - today) / 864e5);
+      // released = live on at least one store
+      const released = status === "done" || !!p.fab || items(p, "stores").some(i => i.s === "done");
+      const cls = released ? "released" : days < 0 ? "late" : "";
+      const tip = released ? "Released" : days < 0 ? `Deadline passed ${-days} d ago` : days === 0 ? "Deadline today" : `Deadline in ${days} d`;
+      date = `<span class="date ${cls}" title="${tip}">${ic("calendar")}${fmtDate(rel)}</span>`;
+    }
+
+    const icons = STAGES.map(s => `<span class="stage ${stageStatus(p, s.id)}" data-pack="${idx}" data-stage="${s.id}">${ic(s.icon)}</span>`).join("");
+    return `
+      <article class="card ${status}">
+        <div class="thumb">
+          ${p.preview ? `<img src="${esc(p.preview)}" alt="" loading="lazy">` : `<div class="ph">${esc(initials(p.name))}</div>`}
+          <span class="badge" style="--c:${badge.c}">${ic(badge.icon)}${badge.label}</span>
+        </div>
+        <div class="body">
+          <div class="head">
+            <div class="info">
+              <h3 class="title" title="${esc(p.name)}">${p.fab ? `<a href="${esc(p.fab)}" target="_blank" rel="noopener">${esc(p.name)}</a>` : esc(p.name)}</h3>
+              <div class="sub" title="${esc(p.kind || "")}">${esc(p.kind || "")}</div>
+            </div>
+            <div class="meta">
+              ${date}
+              ${p.type ? `<span class="tag ${p.type === "Free" ? "free" : ""}">${p.type === "Free" ? "FREE" : "$"}</span>` : ""}
+            </div>
+          </div>
+          <div class="stages">${icons}</div>
+        </div>
+      </article>`;
+  }
+
+  // popover with the stage's items
+  const pop = document.getElementById("pop");
+  function popHtml(p, id) {
+    const s = STAGES.find(x => x.id === id);
+    const st = stageStatus(p, id);
+    const list = items(p, id);
+    const doneN = list.filter(i => i.s === "done").length;
+    const rows = list.map(i => {
+      const lead = LOGO[i.key] ? LOGO[i.key]
+        : ITEM_ICON[i.key] ? `<span class="bullet">${ic(ITEM_ICON[i.key])}</span>`
+        : `<span class="bullet">${ic("dot")}</span>`;
+      const d = parseDate(i.date);
+      return `<div class="pop-r">${lead}<span class="nm">${esc(STORE_NAME[i.key] || i.key)}</span>${d ? `<span class="dt">${fmtDate(d)}</span>` : ""}${mark(i.s)}</div>`;
+    }).join("");
+    return `
+      <div class="pop-h" style="--c:${COLOR[st] === COLOR.todo ? "var(--muted)" : COLOR[st]}">${ic(s.icon)}${s.label}${list.length ? `<span class="cnt">${doneN}/${list.length}</span>` : ""}${mark(st)}</div>
+      ${rows || `<div class="pop-r" style="color:var(--muted)">${STATUS_LABEL[st]}</div>`}`;
+  }
+  function showPop(el) {
+    pop.innerHTML = popHtml(packs[+el.dataset.pack], el.dataset.stage);
+    const r = el.getBoundingClientRect();
+    const w = pop.offsetWidth, h = pop.offsetHeight, m = 8;
+    let left = Math.min(Math.max(m, r.left), innerWidth - w - m);
+    let top = r.top - h - 8;
+    if (top < m) top = r.bottom + 8;
+    pop.style.left = left + "px";
+    pop.style.top = top + "px";
+    pop.classList.add("show");
+  }
+  const hidePop = () => pop.classList.remove("show");
+  const grid = document.getElementById("grid");
+  grid.addEventListener("mouseover", e => { const el = e.target.closest(".stage"); if (el) showPop(el); });
+  grid.addEventListener("mouseout", e => { if (e.target.closest(".stage") && !e.relatedTarget?.closest?.(".stage")) hidePop(); });
+  grid.addEventListener("click", e => { const el = e.target.closest(".stage"); el ? showPop(el) : hidePop(); });
+  addEventListener("scroll", hidePop, { passive: true });
+
+  function renderLegend() {
+    document.getElementById("legend").innerHTML =
+      STAGES.map(s => `<span><span class="stage">${ic(s.icon)}</span>${s.label}</span>`).join("") +
+      `<span class="sep"></span>` +
+      ["todo", "wip", "done", "rejected"].map(k => `<span>${mark(k)}${STATUS_LABEL[k]}</span>`).join("") +
+      `<span class="sep"></span>` +
+      ["done", "rejected"].map(k => `<span><i class="box" style="border-color:${COLOR[k]}"></i>pack ${STATUS_LABEL[k]}</span>`).join("") +
+      `<span class="sep"></span>` +
+      Object.keys(LOGO).map(k => `<span>${LOGO[k]}${STORE_NAME[k]}</span>`).join("");
+  }
+
+  function render() {
+    renderFilters();
+    hidePop();
+    const q = state.q.trim().toLowerCase();
+    const list = packs.map((p, i) => [p, i]).filter(([p]) =>
+      (state.stage === "all" || (state.stage === "rejected" ? packStatus(p) === "rejected" : filterKey(p) === state.stage)) &&
+      (state.type === "all" || p.type === state.type) &&
+      (!q || (p.name + " " + (p.kind || "")).toLowerCase().includes(q)))
+      .sort(([a], [b]) => readiness(a) - readiness(b) || dateKey(b) - dateKey(a));
+    grid.innerHTML = list.length ? list.map(([p, i]) => card(p, i)).join("") : `<div class="empty">Nothing found</div>`;
+  }
+
+  document.getElementById("search").addEventListener("input", e => { state.q = e.target.value; render(); });
+  renderLegend();
+  render();
+</script>
+</body>
+</html>
