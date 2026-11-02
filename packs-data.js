@@ -51,7 +51,7 @@ window.PACKS = [
   },
   { name: "Liminal Spaces", type: null, kind: "Office & Liminal Spaces Modular Kit", release: "2026-11-06", preview: "previews/liminal_spaces.jpg", stages: IN_PRODUCTION },
   { name: "Hotwheels", type: null, kind: "Toy Race Track & Monster Trucks", release: "2026-11-06", preview: "previews/hotwheels.jpg", stages: IN_PRODUCTION },
-  { name: "80s Motel FREE", type: "Free", kind: "Modular Environment Kit", release: null, preview: "previews/motel80s_free.jpg", stages: IN_PRODUCTION },
+  { name: "80s Motel FREE", type: "Free", kind: "Modular Environment Kit", release: "2026-11-04", preview: "previews/motel80s_free.jpg", stages: IN_PRODUCTION },
 
   // --- published on Fab ---
   { name: "Egyptian Slot Symbols", type: "Paid", kind: "9 Slot Machine Icons", release: "2026-10-29", preview: "previews/fab/33a71c1b.jpg", fab: "https://www.fab.com/listings/33a71c1b-7265-447c-8d68-38488c1680c4", stages: DONE },

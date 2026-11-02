@@ -153,8 +153,9 @@
   .legend .box { width: 26px; height: 18px; border-radius: 4px; border: 2px solid var(--line); background: var(--surface); }
   .legend .sep { width: 1px; height: 18px; background: var(--line); }
 
-  /* finished packs go to their own section below the active ones */
-  .section-h { display: flex; align-items: center; gap: 10px; margin: 40px 0 16px; font-weight: 700; font-size: 15px; color: var(--done); }
+  /* work in progress on top, finished packs in their own section below */
+  .section-h { display: flex; align-items: center; gap: 10px; margin: 40px 0 16px; font-weight: 700; font-size: 15px; color: var(--c); }
+  .section-h:first-child { margin-top: 0; }
   .section-h svg.i { width: 18px; height: 18px; }
   .section-h .cnt { color: var(--muted); font-weight: 600; font-size: 13px; }
   .section-h::after { content: ""; flex: 1; height: 1px; background: var(--line); }
@@ -398,9 +399,12 @@
     const cards = l => `<div class="grid">${l.map(([p, i]) => card(p, i)).join("")}</div>`;
     const active = list.filter(([p]) => currentStage(p));
     const done = list.filter(([p]) => !currentStage(p));
+    // section headers only when both groups are on screen
+    const both = active.length && done.length;
+    const head = (icon, label, c, n) => both ? `<div class="section-h" style="--c:${c}">${ic(icon)}${label}<span class="cnt">${n}</span></div>` : "";
     grid.innerHTML = !list.length ? `<div class="grid"><div class="empty">Nothing found</div></div>`
-      : (active.length ? cards(active) : "") +
-        (done.length ? (active.length ? `<div class="section-h">${ic("checkc")}Done<span class="cnt">${done.length}</span></div>` : "") + cards(done) : "");
+      : (active.length ? head("clock", "Work in progress", "var(--wip)", active.length) + cards(active) : "") +
+        (done.length ? head("checkc", "Done", "var(--done)", done.length) + cards(done) : "");
   }
 
   document.getElementById("search").addEventListener("input", e => { state.q = e.target.value; render(); });
