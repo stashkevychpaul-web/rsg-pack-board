@@ -70,9 +70,6 @@
   }
   .card:hover { transform: translateY(-2px); }
   .card.done     { border-color: var(--done); }
-  /* finished packs step back until hovered */
-  .card.done { filter: brightness(.4) saturate(.5); transition: transform .15s, filter .25s; }
-  .card.done:hover, .card.done:focus-within { filter: none; }
   .card.rejected { border-color: var(--bad); }
 
   .thumb { position: relative; aspect-ratio: 16 / 9; background: var(--surface-2); overflow: hidden; }
@@ -156,6 +153,12 @@
   .legend .box { width: 26px; height: 18px; border-radius: 4px; border: 2px solid var(--line); background: var(--surface); }
   .legend .sep { width: 1px; height: 18px; background: var(--line); }
 
+  /* finished packs go to their own section below the active ones */
+  .section-h { display: flex; align-items: center; gap: 10px; margin: 40px 0 16px; font-weight: 700; font-size: 15px; color: var(--done); }
+  .section-h svg.i { width: 18px; height: 18px; }
+  .section-h .cnt { color: var(--muted); font-weight: 600; font-size: 13px; }
+  .section-h::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+
   .empty { color: var(--muted); padding: 60px 0; text-align: center; grid-column: 1 / -1; }
 
   @media (max-width: 640px) {
@@ -176,7 +179,7 @@
 </header>
 
 <main>
-  <div class="grid" id="grid"></div>
+  <div id="grid"></div>
   <div class="legend" id="legend"></div>
 </main>
 <div class="pop" id="pop"></div>
@@ -392,7 +395,12 @@
       (state.type === "all" || p.type === state.type) &&
       (!q || (p.name + " " + (p.kind || "")).toLowerCase().includes(q)))
       .sort(([a], [b]) => readiness(a) - readiness(b) || dateKey(b) - dateKey(a));
-    grid.innerHTML = list.length ? list.map(([p, i]) => card(p, i)).join("") : `<div class="empty">Nothing found</div>`;
+    const cards = l => `<div class="grid">${l.map(([p, i]) => card(p, i)).join("")}</div>`;
+    const active = list.filter(([p]) => currentStage(p));
+    const done = list.filter(([p]) => !currentStage(p));
+    grid.innerHTML = !list.length ? `<div class="grid"><div class="empty">Nothing found</div></div>`
+      : (active.length ? cards(active) : "") +
+        (done.length ? (active.length ? `<div class="section-h">${ic("checkc")}Done<span class="cnt">${done.length}</span></div>` : "") + cards(done) : "");
   }
 
   document.getElementById("search").addEventListener("input", e => { state.q = e.target.value; render(); });
