@@ -15,7 +15,7 @@
 //
 // Published packs below were taken from the Fab seller page on 2026-11-02 and marked done.
 
-window.PACKS_UPDATED = "2026-11-02";
+window.PACKS_UPDATED = "2026-11-03";
 
 // Default checklist of each stage (what the hover popover lists)
 const CHECKLIST = {
@@ -44,8 +44,8 @@ window.PACKS = [
     preview: "previews/lastwizard_free_knight.jpg",
     stages: {
       production: stage("production", "done"),
-      promo: stage("promo", "done"),
-      stores: { status: "wip", items: { fab: "todo", unity: "todo", cgtrader: "todo" } },
+      promo: { items: { "Screens": "done", "Video": "wip" } },
+      stores: stage("stores", "todo"),
       mkt: stage("mkt", "todo"),
     },
   },
