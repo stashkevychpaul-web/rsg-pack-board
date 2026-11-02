@@ -70,6 +70,9 @@
   }
   .card:hover { transform: translateY(-2px); }
   .card.done     { border-color: var(--done); }
+  /* finished packs step back until hovered */
+  .card.done { filter: brightness(.4) saturate(.5); transition: transform .15s, filter .25s; }
+  .card.done:hover, .card.done:focus-within { filter: none; }
   .card.rejected { border-color: var(--bad); }
 
   .thumb { position: relative; aspect-ratio: 16 / 9; background: var(--surface-2); overflow: hidden; }
