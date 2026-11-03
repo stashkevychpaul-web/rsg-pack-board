@@ -49,6 +49,16 @@ window.PACKS = [
       mkt: stage("mkt", "todo"),
     },
   },
+  {
+    name: "One-Handed Sword", type: "Paid", kind: "Female Character Combat Animation Pack", release: "2026-11-30",
+    preview: "previews/onehand_sword_female_anim.jpg",
+    stages: {
+      production: { items: { "Animations": "wip", "Unity / Unreal / FBX": "todo", "Validation": "todo" } },
+      promo: stage("promo", "todo"),
+      stores: stage("stores", "todo"),
+      mkt: stage("mkt", "todo"),
+    },
+  },
   { name: "Liminal Spaces", type: null, kind: "Office & Liminal Spaces Modular Kit", release: "2026-11-06", preview: "previews/liminal_spaces.jpg", stages: IN_PRODUCTION },
   { name: "Hotwheels", type: null, kind: "Toy Race Track & Monster Trucks", release: "2026-11-06", preview: "previews/hotwheels.jpg", stages: IN_PRODUCTION },
   { name: "80s Motel FREE", type: "Free", kind: "Modular Environment Kit", release: "2026-11-04", preview: "previews/motel80s_free.jpg", stages: IN_PRODUCTION },
