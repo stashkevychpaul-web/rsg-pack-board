@@ -310,8 +310,8 @@
     let date = "";
     if (rel) {
       const days = Math.round((rel - today) / 864e5);
-      // released = live on at least one store
-      const released = status === "done" || !!p.fab || items(p, "stores").some(i => i.s === "done");
+      // released = every stage done; a pack still waiting on a store is overdue once the date passes
+      const released = status === "done";
       const cls = released ? "released" : days < 0 ? "late" : "";
       const tip = released ? "Released" : days < 0 ? `Deadline passed ${-days} d ago` : days === 0 ? "Deadline today" : `Deadline in ${days} d`;
       date = `<span class="date ${cls}" title="${tip}">${ic("calendar")}${fmtDate(rel)}</span>`;
