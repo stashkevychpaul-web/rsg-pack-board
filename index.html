@@ -71,6 +71,9 @@
   .card:hover { transform: translateY(-2px); }
   .card.done     { border-color: var(--done); }
   .card.rejected { border-color: var(--bad); }
+  /* not started: dimmed until hovered */
+  .card.todo { filter: brightness(.45) saturate(.55); transition: transform .15s, filter .25s; }
+  .card.todo:hover, .card.todo:focus-within { filter: none; }
 
   .thumb { position: relative; aspect-ratio: 16 / 9; background: var(--surface-2); overflow: hidden; }
   .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .3s; }
@@ -199,6 +202,7 @@
     calendar: '<rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/>',
     check:  '<path d="M20 6 9 17l-5-5"/>',
     checkc: '<circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>',
+    circle: '<circle cx="12" cy="12" r="10"/>',
     clock:  '<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>',
     x:      '<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
     xcircle:'<circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/>',
@@ -266,7 +270,7 @@
   document.getElementById("brand").innerHTML = `${ic("grid")}Pack Board<small>${esc(window.PACKS_UPDATED || "")}</small>`;
   document.getElementById("searchWrap").insertAdjacentHTML("afterbegin", ic("search"));
 
-  function filterKey(p) { return currentStage(p)?.id || "complete"; }
+  function filterKey(p) { return packStatus(p) === "todo" ? "todo" : currentStage(p)?.id || "complete"; }
 
   // sort order: least ready first — current stage, "not started" before "in progress"; complete packs last
   function readiness(p) {
@@ -282,6 +286,7 @@
       id === "all" ? true : id === "rejected" ? packStatus(p) === "rejected" : filterKey(p) === id).length;
     const opts = [
       { id: "all", label: "All", icon: "layers", c: "var(--text)" },
+      { id: "todo", label: "Not started", icon: "circle", c: "var(--muted)" },
       ...STAGES.map(s => ({ ...s, c: "var(--text)" })),
       { id: "complete", label: "Done", icon: "checkc", c: "var(--done)" },
       { id: "rejected", label: "Rejected", icon: "xcircle", c: "var(--bad)" },
@@ -302,7 +307,9 @@
   function card(p, idx) {
     const status = packStatus(p);
     const cur = currentStage(p);
-    const badge = cur
+    const badge = status === "todo"
+      ? { label: "Not started", icon: "circle", c: "var(--muted)" }
+      : cur
       ? { label: cur.label, icon: cur.icon, c: COLOR[stageStatus(p, cur.id)] === COLOR.todo ? "var(--muted)" : COLOR[stageStatus(p, cur.id)] }
       : { label: "Done", icon: "checkc", c: "var(--done)" };
 
@@ -397,14 +404,18 @@
       (!q || (p.name + " " + (p.kind || "")).toLowerCase().includes(q)))
       .sort(([a], [b]) => readiness(a) - readiness(b) || dateKey(b) - dateKey(a));
     const cards = l => `<div class="grid">${l.map(([p, i]) => card(p, i)).join("")}</div>`;
-    const active = list.filter(([p]) => currentStage(p));
+    const idle = list.filter(([p]) => packStatus(p) === "todo");
+    const active = list.filter(([p]) => packStatus(p) !== "todo" && currentStage(p));
     const done = list.filter(([p]) => !currentStage(p));
-    // section headers only when both groups are on screen
-    const both = active.length && done.length;
-    const head = (icon, label, c, n) => both ? `<div class="section-h" style="--c:${c}">${ic(icon)}${label}<span class="cnt">${n}</span></div>` : "";
+    const groups = [
+      [active, "clock", "Work in progress", "var(--wip)"],
+      [idle, "circle", "Not started", "var(--muted)"],
+      [done, "checkc", "Done", "var(--done)"],
+    ].filter(g => g[0].length);
+    // section headers only when more than one group is on screen
+    const head = (icon, label, c, n) => groups.length > 1 ? `<div class="section-h" style="--c:${c}">${ic(icon)}${label}<span class="cnt">${n}</span></div>` : "";
     grid.innerHTML = !list.length ? `<div class="grid"><div class="empty">Nothing found</div></div>`
-      : (active.length ? head("clock", "Work in progress", "var(--wip)", active.length) + cards(active) : "") +
-        (done.length ? head("checkc", "Done", "var(--done)", done.length) + cards(done) : "");
+      : groups.map(([l, icon, label, c]) => head(icon, label, c, l.length) + cards(l)).join("");
   }
 
   document.getElementById("search").addEventListener("input", e => { state.q = e.target.value; render(); });
