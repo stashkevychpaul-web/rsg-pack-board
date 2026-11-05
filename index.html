@@ -114,13 +114,7 @@
   .date.released { color: var(--done); }
 
   /* 4 stage icons, coloured by stage status */
-  .stages { display: flex; gap: 6px; align-items: center; }
-  .team { margin-left: auto; display: flex; cursor: default; }
-  .team i {
-    width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; font-style: normal;
-    font-size: 11px; font-weight: 700; color: var(--text); background: var(--surface-2); border: 2px solid var(--surface);
-  }
-  .team i + i { margin-left: -7px; }
+  .stages { display: flex; gap: 6px; }
   .stage {
     width: 32px; height: 32px; border-radius: 8px; display: grid; place-items: center; cursor: default;
     background: var(--surface-2); color: var(--todo); border: 1px solid var(--line);
@@ -348,7 +342,7 @@
               ${p.type ? `<span class="tag ${p.type === "Free" ? "free" : ""}">${p.type === "Free" ? "FREE" : "$"}</span>` : ""}
             </div>
           </div>
-          <div class="stages">${icons}${(p.team || []).length ? `<span class="team" title="${esc(p.team.join(", "))}">${p.team.map(n => `<i>${esc(n[0].toUpperCase())}</i>`).join("")}</span>` : ""}</div>
+          <div class="stages">${icons}</div>
         </div>
       </article>`;
   }

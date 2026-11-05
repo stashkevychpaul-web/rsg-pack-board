@@ -8,7 +8,6 @@
 //          With items only, the stage status is derived: any rejected -> rejected, all done -> done,
 //          anything started -> wip, else todo. A { status } next to items overrides that.
 //          Stores items use store keys: fab, unity, cgtrader (wip = submitted, waiting for approval).
-// team:    optional ["Name", ...] — people working on the pack, shown as initials on the card
 // fab:     Fab listing URL (the title links to it)
 // preview: path relative to index.html (16:9, 960x540 jpg); null = placeholder
 // Pack outline: green = all stages done, red = something rejected, otherwise none.
@@ -77,8 +76,6 @@ window.PACKS = [
       mkt: stage("mkt", "todo"),
     },
   },
-  // started Wed 2026-11-04, Dima + Ostap, in parallel with the other production packs
-  { name: "Hospital Tycoon Kit", type: null, kind: "Modular Clinic, Equipment & Staff", release: "2026-11-06", team: ["Dima", "Ostap"], preview: "previews/hospital_tycoon.jpg", stages: IN_PRODUCTION },
   { name: "Liminal Spaces", type: null, kind: "Office & Liminal Spaces Modular Kit", release: "2026-11-06", preview: "previews/liminal_spaces.jpg", stages: IN_PRODUCTION },
   { name: "Hotwheels", type: null, kind: "Toy Race Track & Monster Trucks", release: "2026-11-06", preview: "previews/hotwheels.jpg", stages: IN_PRODUCTION },
   { name: "80s Motel FREE", type: "Free", kind: "Modular Environment Kit", release: "2026-11-04", preview: "previews/motel80s_free.jpg", stages: IN_PRODUCTION },
@@ -87,7 +84,7 @@ window.PACKS = [
   { name: "Tower Defence", type: null, kind: "Modular Towers & Upgrades", release: null, preview: "previews/towerdefence.jpg", stages: NOT_STARTED },
   { name: "Cozy Store Simulator", type: null, kind: "Modular Shop Interior & Products", release: null, preview: "previews/cozystore.jpg", stages: NOT_STARTED },
   { name: "Roguelite Archer Kit", type: null, kind: "Arena, Hero & Gear Modules", release: null, preview: "previews/roguelite_archer.jpg", stages: NOT_STARTED },
-  // (Hospital Tycoon Kit moved to in progress above)
+  { name: "Hospital Tycoon Kit", type: null, kind: "Modular Clinic, Equipment & Staff", release: null, preview: "previews/hospital_tycoon.jpg", stages: NOT_STARTED },
   { name: "Arena Brawlers Kit", type: null, kind: "Arena, Fighters & Blaster Upgrades", release: null, preview: "previews/arena_brawlers.jpg", stages: NOT_STARTED },
 
   // --- published on Fab ---
