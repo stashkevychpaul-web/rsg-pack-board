@@ -15,7 +15,7 @@
 //
 // Published packs below were taken from the Fab seller page on 2026-11-02 and marked done.
 
-window.PACKS_UPDATED = "2026-11-03";
+window.PACKS_UPDATED = "2026-11-10";
 
 // Default checklist of each stage (what the hover popover lists)
 const CHECKLIST = {
@@ -34,6 +34,13 @@ const WAITING_UNITY = { ...DONE, stores: { items: { fab: "done", unity: "wip", c
 const NOT_STARTED = {
   production: { items: { "Models": "todo", "Textures": "todo", "Unity / Unreal / FBX": "todo", "Validation": "todo" } },
   promo: stage("promo", "todo"),
+  stores: stage("stores", "todo"),
+  mkt: stage("mkt", "todo"),
+};
+// Production finished, promo (screens, video) under way
+const IN_PROMO = {
+  production: stage("production", "done"),
+  promo: { items: { "Screens": "wip", "Video": "todo" } },
   stores: stage("stores", "todo"),
   mkt: stage("mkt", "todo"),
 };
@@ -76,9 +83,9 @@ window.PACKS = [
       mkt: stage("mkt", "todo"),
     },
   },
-  { name: "Liminal Spaces", type: null, kind: "Office & Liminal Spaces Modular Kit", release: "2026-11-06", preview: "previews/liminal_spaces.jpg", stages: IN_PRODUCTION },
-  { name: "Hotwheels", type: null, kind: "Toy Race Track & Monster Trucks", release: "2026-11-06", preview: "previews/hotwheels.jpg", stages: IN_PRODUCTION },
-  { name: "80s Motel FREE", type: "Free", kind: "Modular Environment Kit", release: "2026-11-04", preview: "previews/motel80s_free.jpg", stages: IN_PRODUCTION },
+  { name: "Liminal Spaces", type: null, kind: "Office & Liminal Spaces Modular Kit", release: "2026-11-06", preview: "previews/liminal_spaces.jpg", stages: IN_PROMO },
+  { name: "Hotwheels", type: null, kind: "Toy Race Track & Monster Trucks", release: "2026-11-06", preview: "previews/hotwheels.jpg", stages: IN_PROMO },
+  { name: "80s Motel FREE", type: "Free", kind: "Modular Environment Kit", release: "2026-11-04", preview: "previews/motel80s_free.jpg", stages: IN_PROMO },
 
   // --- not started (concept art only, 2026-11-01/02) ---
   { name: "Tower Defence", type: null, kind: "Modular Towers & Upgrades", release: null, preview: "previews/towerdefence.jpg", stages: NOT_STARTED },
